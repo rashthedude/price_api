@@ -1,7 +1,10 @@
 require 'recipiez/capistrano'
+require "capistrano/bundler"
+require "capistrano/rails/assets"
+require "capistrano/rails/migrations"
 
 set :application, "price_api"
-set :repository,  ""
+set :repository,  "git@github.com:rashthedude/price_api.git"
 set :branch, "master"
 
 default_run_options[:pty] = true

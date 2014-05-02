@@ -1,0 +1,1 @@
+exports.RedisClient = require('./redis_client').RedisClient

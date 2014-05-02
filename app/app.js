@@ -1,5 +1,5 @@
 (function() {
-  var Express, app, info, models, settings, util;
+  var Express, app, info, models, rc, settings, util;
 
   Express = require('express');
 
@@ -10,6 +10,10 @@
   util = require('util');
 
   app = module.exports = Express();
+
+  rc = new models.RedisClient();
+
+  global.redisClient = rc.client;
 
   app.use(Express.json());
 

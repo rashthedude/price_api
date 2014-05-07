@@ -17,7 +17,8 @@
     "coffee-script": "^1.7.1",
     "socket.io": "^0.9.16",
     "kue": "^0.7.6",
-    "mailparser": "^0.4.2"
+    "mailparser": "^0.4.3",
+    "mail-listener": "^0.7.1"
   },
   "engines": {
     "node": "0.10.25"

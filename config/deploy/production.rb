@@ -1,10 +1,8 @@
 require 'recipiez/capistrano'
-require "capistrano/bundler"
-require "capistrano/rails/assets"
-require "capistrano/rails/migrations"
+
 
 set :application, "price_api"
-set :repository,  "git@github.com:rashthedude/price_api.git"
+set :repository, "git@github.com:rashthedude/price_api.git"
 set :branch, "master"
 
 default_run_options[:pty] = true
@@ -17,15 +15,10 @@ set :runner, user
 
 set :node_env, "production"
 set :rails_env, node_env
-set :node_port, 3050
+set :node_port, 3355
 
 set :deploy_to, "/var/www/apps/#{application}"
 set :app_domain, "customsmscs.veoo.com 54.216.82.205"
-
-role :web, "customsmscs.veoo.com"                          # Your HTTP server, Apache/etc
-role :app, "customsmscs.veoo.com"                          # This may be the same as your `Web` server
-role :db,  "customsmscs.veoo.com", :primary => true # This is where Rails migrations will run
-
 
 
 ssh_options[:keys] =  %w(/Users/rashthedude/.ssh/blissio ~/.ssh/mark)

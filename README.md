@@ -1,4 +1,4 @@
 Price API
 =========
 
-A polyglot app that allows any PHP and Node.js application to communicate using the pub-sub pattern!
+Mail-listener listens for incoming e-mail and a parser is responsible for reading the correct values off the CSV.

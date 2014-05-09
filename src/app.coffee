@@ -9,6 +9,7 @@ csv       = require "csv"
 fs        = require "fs"
 request   = require "request"
 Mailparser = require("mailparser").MailParser
+notifier  = require "mail-notifier"
 
 mp = new Mailparser({streamAttachments: true})
 
@@ -18,31 +19,45 @@ app.use(Express.json())
 app.use(Express.urlencoded())
 app.use(Express.methodOverride())
 
-mailListener = new MailListener
-  username: "notify@veoo.com"
+imap = {
+  user: "notify@veoo.com"
   password: "bOC8yh32phf"
   host: "imap.gmail.com"
   port: 993 # imap port
-  tls: true
+  box: "RATES-NOTIFY"
+  tls: true #use secure connection
   tlsOptions: { rejectUnauthorized: false }
-  mailbox: "RATES-NOTIFY" # mailbox to monitor
-  markSeen: true # all fetched email willbe marked as seen and not fetched next time
-  fetchUnreadOnStart: true
-  mailParserOptions: {streamAttachments: true} # makes it able to read email attachments
+}
+notifier(imap).on 'mail',(mail) -> 
+  console.log 'here is the mail'
+  start()
+
+
+# mailListener = new MailListener
+#   username: "notify@veoo.com"
+#   password: "bOC8yh32phf"
+#   host: "imap.gmail.com"
+#   port: 993 # imap port
+#   tls: true
+#   tlsOptions: { rejectUnauthorized: false }
+#   mailbox: "RATES-NOTIFY" # mailbox to monitor
+#   markSeen: true # all fetched email willbe marked as seen and not fetched next time
+#   fetchUnreadOnStart: true
+#   mailParserOptions: {streamAttachments: true} # makes it able to read email attachments
 
 #Routes
 app.get '/', (req, res) ->    
     
-  mailListener.start()
-  mailListener.on "server:connected", ->
-    console.log "Successfully connected to the Notify Imap server"
+  # mailListener.start()
+  # mailListener.on "server:connected", ->
+  #   console.log "Successfully connected to the Notify Imap server"
     
-  mailListener
-    .on "mail", (mail, seqno, attributes) ->
-      mp.on "attachment", (attachment) ->
-        console.log 'we are here'
-        output = fs.createWriteStream(attachment.generatedFileName)
-        attachment.pipe(output)
+  # mailListener
+  #   .on "mail", (mail, seqno, attributes) ->
+  #     mp.on "attachment", (attachment) ->
+  #       console.log 'we are here'
+  #       output = fs.createWriteStream(attachment.generatedFileName)
+  #       attachment.pipe(output)
   
   #mailListener
   #.on "mail", (mail, seqno, attributes) ->

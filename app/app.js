@@ -1,5 +1,5 @@
 (function() {
-  var Express, MailListener, Mailparser, app, csv, fs, info, mailListener, models, mp, rc, request, settings, util;
+  var Express, MailListener, Mailparser, app, csv, fs, imap, info, models, mp, notifier, rc, request, settings, util;
 
   Express = require('express');
 
@@ -23,6 +23,8 @@
 
   Mailparser = require("mailparser").MailParser;
 
+  notifier = require("mail-notifier");
+
   mp = new Mailparser({
     streamAttachments: true
   });
@@ -35,36 +37,24 @@
 
   app.use(Express.methodOverride());
 
-  mailListener = new MailListener({
-    username: "notify@veoo.com",
+  imap = {
+    user: "notify@veoo.com",
     password: "bOC8yh32phf",
     host: "imap.gmail.com",
     port: 993,
+    box: "RATES-NOTIFY",
     tls: true,
     tlsOptions: {
       rejectUnauthorized: false
-    },
-    mailbox: "RATES-NOTIFY",
-    markSeen: true,
-    fetchUnreadOnStart: true,
-    mailParserOptions: {
-      streamAttachments: true
     }
+  };
+
+  notifier(imap).on('mail', function(mail) {
+    console.log('here is the mail');
+    return start();
   });
 
   app.get('/', function(req, res) {
-    mailListener.start();
-    mailListener.on("server:connected", function() {
-      return console.log("Successfully connected to the Notify Imap server");
-    });
-    mailListener.on("mail", function(mail, seqno, attributes) {
-      return mp.on("attachment", function(attachment) {
-        var output;
-        console.log('we are here');
-        output = fs.createWriteStream(attachment.generatedFileName);
-        return attachment.pipe(output);
-      });
-    });
     return res.send(200, 'Price Checking API Interface');
   });
 

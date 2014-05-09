@@ -21,7 +21,7 @@ app.use(Express.methodOverride())
 
 imap = {
   user: "notify@veoo.com"
-  password: "bOC8yh32phf"
+  password: ""
   host: "imap.gmail.com"
   port: 993 # imap port
   box: "RATES-NOTIFY"

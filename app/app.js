@@ -1,5 +1,5 @@
 (function() {
-  var Express, MailListener, Mailparser, app, csv, fs, imap, info, models, notifier, rc, request, settings, stream, util;
+  var Express, app, csv, fs, imap, info, models, notifier, rc, request, settings, stream, util;
 
   Express = require('express');
 
@@ -13,8 +13,6 @@
 
   rc = new models.RedisClient();
 
-  MailListener = require("mail-listener2");
-
   csv = require("csv");
 
   fs = require("fs");
@@ -22,8 +20,6 @@
   stream = require("stream");
 
   request = require("request");
-
-  Mailparser = require("mailparser").MailParser;
 
   notifier = require("mail-notifier");
 
@@ -47,20 +43,19 @@
     }
   };
 
-  notifier(imap).on('mail', (function(mail) {
-    var bufferStream, output;
-    console.log('here is the mail', mail.attachments);
-    bufferStream = new stream.Transform();
-    bufferStream.push(mail.attachments[0].content);
-    output = fs.createWriteStream(mail.attachments[0].generatedFileName);
-    return bufferStream.pipe(output);
-  })).on('error', function(err) {
-    return console.log('error', err);
-  }).on('end', function() {
-    return console.log('connection has been closed');
-  }).start();
-
   app.get('/', function(req, res) {
+    notifier(imap).on('mail', (function(mail) {
+      var bufferStream, output;
+      console.log('here is the mail', mail.attachments);
+      bufferStream = new stream.Transform();
+      bufferStream.push(mail.attachments[0].content);
+      output = fs.createWriteStream(mail.attachments[0].generatedFileName);
+      return bufferStream.pipe(output);
+    })).on('error', function(err) {
+      return console.log('error', err);
+    }).on('end', function() {
+      return console.log('connection has been closed');
+    }).start();
     return res.send(200, 'Price Checking API Interface');
   });
 

@@ -7,11 +7,11 @@ rc        = new models.RedisClient()
 MailListener = require "mail-listener2"
 csv       = require "csv"
 fs        = require "fs"
+stream    = require "stream"
 request   = require "request"
 Mailparser = require("mailparser").MailParser
 notifier  = require "mail-notifier"
 
-mp = new Mailparser({streamAttachments: true})
 
 global.redisClient = rc.client
 
@@ -28,9 +28,21 @@ imap = {
   tls: true #use secure connection
   tlsOptions: { rejectUnauthorized: false }
 }
-notifier(imap).on 'mail',(mail) -> 
-  console.log 'here is the mail'
-  start()
+
+# Differentiate between different operators, shall it over-write or create a new file for every incoming file?
+notifier(imap)
+  .on 'mail',( (mail) -> 
+    console.log 'here is the mail', mail.attachments
+    bufferStream = new stream.Transform()
+    bufferStream.push(mail.attachments[0].content)
+    output = fs.createWriteStream mail.attachments[0].generatedFileName
+    bufferStream.pipe(output)
+  )
+  .on 'error', (err) ->
+    console.log 'error', err
+  .on 'end', () ->
+    console.log 'connection has been closed'
+  .start()
 
 
 # mailListener = new MailListener

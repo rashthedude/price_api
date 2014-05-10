@@ -10,7 +10,6 @@ stream    = require "stream"
 request   = require "request"
 notifier  = require "mail-notifier"
 
-
 global.redisClient = rc.client
 
 app.use(Express.json())

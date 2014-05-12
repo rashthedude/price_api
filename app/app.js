@@ -1,5 +1,5 @@
 (function() {
-  var Express, app, csv, fs, imap, info, models, notifier, rc, request, settings, stream, util;
+  var Express, app, async, csv, fs, imap, info, models, notifier, path, rc, request, settings, stream, util;
 
   Express = require('express');
 
@@ -13,6 +13,8 @@
 
   rc = new models.RedisClient();
 
+  path = require("path");
+
   csv = require("csv");
 
   fs = require("fs");
@@ -22,6 +24,8 @@
   request = require("request");
 
   notifier = require("mail-notifier");
+
+  async = require("async");
 
   global.redisClient = rc.client;
 
@@ -57,6 +61,36 @@
       return console.log('connection has been closed');
     }).start();
     return res.send(200, 'Price Checking API Interface');
+  });
+
+  app.get('/parse', function(req, res) {
+    var p;
+    res.send(200, 'Here is where the csv parsing gets triggered');
+    p = './';
+    return fs.readdir('./', function(err, files) {
+      if (err) {
+        throw err;
+      }
+      console.log('Here are the files', files);
+      return files.map(function(file) {
+        return path.join(p, file);
+      }).filter(function(file) {
+        return fs.statSync(file).isFile();
+      }).forEach(function(file) {
+        console.log("%s (%s)", file, path.extname(file));
+        if (path.extname(file) === '.csv') {
+          console.log('here is the found csv', file);
+          return csv().from.path('./' + file).to.stream(fs.createWriteStream(__dirname + '/sample.out')).transform(function(row) {
+            row.unshift(row.pop());
+            return row;
+          }).on('record', function(row, index) {
+            return console.log('#' + index + ' ' + JSON.stringify(row));
+          }).on('error', function(err) {
+            return console.log('Error: ', err);
+          });
+        }
+      });
+    });
   });
 
   if (!module.parent) {
